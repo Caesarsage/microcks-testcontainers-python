@@ -40,10 +40,13 @@ from .models import (
     TestStepResult,
     UnidirectionalEvent,
 )
+from .microcks_container import MicrocksContainer
 from .assertions import assert_failure, assert_success
 from .exceptions import MicrocksException, MicrocksTestFailure
 
 __all__ = [
+    # Containers
+    "MicrocksContainer",
     # Models
     "DailyInvocationStatistic",
     "EventMessage",
