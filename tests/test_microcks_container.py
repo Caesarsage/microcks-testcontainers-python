@@ -119,68 +119,64 @@ class TestMicrocksContainerContractTest:
         from testcontainers.core.network import Network
         from testcontainers.core.waiting_utils import wait_for_logs
 
-        network = Network()
-        network.start()
+        with Network() as network:
+            with (
+                MicrocksContainer()
+                .with_network(network)
+            ) as mc:
+                mc.import_as_main_artifact(str(RESOURCES / "apipastries-openapi.yaml"))
 
-        try:
-            mc = MicrocksContainer()
-            mc.with_network(network)
-            mc.start()
-            mc.import_as_main_artifact(str(RESOURCES / "apipastries-openapi.yaml"))
+                bad = DockerContainer("quay.io/microcks/contract-testing-demo:01")
+                bad.with_network(network)
+                bad.with_network_aliases("bad-impl")
+                bad.start()
+                wait_for_logs(bad, "Example app listening on port 3001")
 
-            bad = DockerContainer("quay.io/microcks/contract-testing-demo:01")
-            bad.with_network(network)
-            bad.with_network_aliases("bad-impl")
-            bad.start()
-            wait_for_logs(bad, "Example app listening on port 3001")
+                good = DockerContainer("quay.io/microcks/contract-testing-demo:02")
+                good.with_network(network)
+                good.with_network_aliases("good-impl")
+                good.start()
+                wait_for_logs(good, "Example app listening on port 3002")
 
-            good = DockerContainer("quay.io/microcks/contract-testing-demo:02")
-            good.with_network(network)
-            good.with_network_aliases("good-impl")
-            good.start()
-            wait_for_logs(good, "Example app listening on port 3002")
+                try:
+                    # Test bad implementation - should fail
+                    result = mc.test_endpoint(
+                        TestRequest(
+                            service_id="API Pastries:0.0.1",
+                            runner_type=TestRunnerType.OPEN_API_SCHEMA,
+                            test_endpoint="http://bad-impl:3001",
+                            timeout=2000,
+                        )
+                    )
+                    assert result.success is False
+                    assert result.tested_endpoint == "http://bad-impl:3001"
+                    assert len(result.test_case_results) == 3
+                    assert "string found, number expected" in result.test_case_results[0].test_step_results[0].message
+                    assert "required property 'status' not found" in result.test_case_results[0].test_step_results[0].message
 
-            # Test bad implementation - should fail
-            result = mc.test_endpoint(
-                TestRequest(
-                    service_id="API Pastries:0.0.1",
-                    runner_type=TestRunnerType.OPEN_API_SCHEMA,
-                    test_endpoint="http://bad-impl:3001",
-                    timeout=2000,
-                )
-            )
-            assert result.success is False
-            assert result.tested_endpoint == "http://bad-impl:3001"
-            assert len(result.test_case_results) == 3
-            assert "string found, number expected" in result.test_case_results[0].test_step_results[0].message
-            assert "required property 'status' not found" in result.test_case_results[0].test_step_results[0].message
+                    # Verify messages retrieval
+                    messages = mc.get_messages_for_test_case(result, "GET /pastries")
+                    assert len(messages) == 3
+                    for msg in messages:
+                        assert msg.request is not None
+                        assert msg.response is not None
+                        assert msg.request.content is not None
+                        assert len(msg.request.query_parameters) == 1
+                        assert msg.request.query_parameters[0].name == "size"
 
-            # Verify messages retrieval
-            messages = mc.get_messages_for_test_case(result, "GET /pastries")
-            assert len(messages) == 3
-            for msg in messages:
-                assert msg.request is not None
-                assert msg.response is not None
-                assert msg.request.content is not None
-                assert len(msg.request.query_parameters) == 1
-                assert msg.request.query_parameters[0].name == "size"
-
-            # Test good implementation - should pass
-            result = mc.test_endpoint(
-                TestRequest(
-                    service_id="API Pastries:0.0.1",
-                    runner_type=TestRunnerType.OPEN_API_SCHEMA,
-                    test_endpoint="http://good-impl:3002",
-                    timeout=3000,
-                )
-            )
-            assert result.success is True
-            assert result.tested_endpoint == "http://good-impl:3002"
-            assert len(result.test_case_results) == 3
-            assert result.test_case_results[0].test_step_results[0].message == ""
-
-        finally:
-            mc.stop()
-            bad.stop()
-            good.stop()
-            network.stop()
+                    # Test good implementation - should pass
+                    result = mc.test_endpoint(
+                        TestRequest(
+                            service_id="API Pastries:0.0.1",
+                            runner_type=TestRunnerType.OPEN_API_SCHEMA,
+                            test_endpoint="http://good-impl:3002",
+                            timeout=3000,
+                        )
+                    )
+                    assert result.success is True
+                    assert result.tested_endpoint == "http://good-impl:3002"
+                    assert len(result.test_case_results) == 3
+                    assert result.test_case_results[0].test_step_results[0].message == ""
+                finally:
+                    bad.stop()
+                    good.stop()
