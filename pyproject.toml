@@ -54,7 +54,7 @@ testpaths = ["tests"]
 timeout = 300
 markers = ["integration: tests requiring Docker"]
 filterwarnings = [
-    "ignore::pytest.PytestCollectionWarning",
+    "ignore:cannot collect test class:pytest.PytestCollectionWarning",
 ]
 
 [tool.mypy]
