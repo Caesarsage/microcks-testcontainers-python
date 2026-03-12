@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import os
+from typing import Any
 from urllib.parse import quote
 
 import requests
@@ -94,7 +95,7 @@ def create_secret(endpoint: str, secret: Secret) -> None:
         raise MicrocksException(f"Secret has not been correctly created: {response.text}")
 
 
-def launch_test(endpoint: str, test_request: TestRequest) -> dict:
+def launch_test(endpoint: str, test_request: TestRequest) -> dict[str, Any]:
     """Launch a conformance test on Microcks. Returns raw JSON dict with test result ID."""
     response = requests.post(
         f"{endpoint}/api/tests",
@@ -105,7 +106,8 @@ def launch_test(endpoint: str, test_request: TestRequest) -> dict:
     if response.status_code != 201:
         raise MicrocksException("Couldn't launch new test on Microcks. Check container logs.")
 
-    return response.json()
+    result: dict[str, Any] = response.json()
+    return result
 
 
 def get_test_result(endpoint: str, test_result_id: str) -> TestResult:

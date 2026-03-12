@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 
 
 class TestRunnerType(str, Enum):
@@ -52,9 +52,9 @@ class Secret:
     token_header: Optional[str] = None
     ca_cert_pem: Optional[str] = None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to dict with camelCase keys for Microcks API."""
-        result: dict = {"name": self.name}
+        result: dict[str, Any] = {"name": self.name}
         if self.description is not None:
             result["description"] = self.description
         if self.username is not None:
@@ -83,9 +83,9 @@ class OAuth2ClientContext:
     password: Optional[str] = None
     refresh_token: Optional[str] = None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to dict with camelCase keys for Microcks API."""
-        result: dict = {
+        result: dict[str, Any] = {
             "clientId": self.client_id,
             "tokenUri": self.token_uri,
             "grantType": self.grant_type.value,
@@ -113,12 +113,12 @@ class TestRequest:
     timeout: int
     secret_name: Optional[str] = None
     filtered_operations: Optional[list[str]] = None
-    operations_headers: Optional[dict[str, list[dict]]] = None
+    operations_headers: Optional[dict[str, list[dict[str, Any]]]] = None
     oauth2_context: Optional[OAuth2ClientContext] = None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to dict with camelCase keys for Microcks API."""
-        result: dict = {
+        result: dict[str, Any] = {
             "serviceId": self.service_id,
             "testEndpoint": self.test_endpoint,
             "runnerType": self.runner_type.value,
@@ -166,7 +166,7 @@ class Request:
     query_parameters: list[Parameter] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, data: dict) -> Request:
+    def from_dict(cls, data: dict[str, Any]) -> Request:
         """Create from a JSON dict with camelCase keys."""
         return cls(
             name=data.get("name", ""),
@@ -198,7 +198,7 @@ class Response:
     is_fault: bool = False
 
     @classmethod
-    def from_dict(cls, data: dict) -> Response:
+    def from_dict(cls, data: dict[str, Any]) -> Response:
         """Create from a JSON dict with camelCase keys."""
         return cls(
             name=data.get("name", ""),
@@ -230,7 +230,7 @@ class EventMessage:
     dispatch_criteria: str = ""
 
     @classmethod
-    def from_dict(cls, data: dict) -> EventMessage:
+    def from_dict(cls, data: dict[str, Any]) -> EventMessage:
         """Create from a JSON dict with camelCase keys."""
         return cls(
             name=data.get("name", ""),
@@ -253,7 +253,7 @@ class RequestResponsePair:
     response: Response
 
     @classmethod
-    def from_dict(cls, data: dict) -> RequestResponsePair:
+    def from_dict(cls, data: dict[str, Any]) -> RequestResponsePair:
         """Create from a JSON dict."""
         return cls(
             request=Request.from_dict(data.get("request", {})),
@@ -268,7 +268,7 @@ class UnidirectionalEvent:
     event_message: EventMessage
 
     @classmethod
-    def from_dict(cls, data: dict) -> UnidirectionalEvent:
+    def from_dict(cls, data: dict[str, Any]) -> UnidirectionalEvent:
         """Create from a JSON dict."""
         return cls(event_message=EventMessage.from_dict(data.get("eventMessage", {})))
 
@@ -284,7 +284,7 @@ class TestStepResult:
     message: str = ""
 
     @classmethod
-    def from_dict(cls, data: dict) -> TestStepResult:
+    def from_dict(cls, data: dict[str, Any]) -> TestStepResult:
         """Create from a JSON dict with camelCase keys."""
         return cls(
             success=data.get("success", False),
@@ -305,7 +305,7 @@ class TestCaseResult:
     test_step_results: list[TestStepResult] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, data: dict) -> TestCaseResult:
+    def from_dict(cls, data: dict[str, Any]) -> TestCaseResult:
         """Create from a JSON dict with camelCase keys."""
         return cls(
             success=data.get("success", False),
@@ -323,7 +323,7 @@ class SecretRef:
     name: str = ""
 
     @classmethod
-    def from_dict(cls, data: dict) -> SecretRef:
+    def from_dict(cls, data: dict[str, Any]) -> SecretRef:
         """Create from a JSON dict with camelCase keys."""
         return cls(secret_id=data.get("secretId", ""), name=data.get("name", ""))
 
@@ -338,7 +338,7 @@ class OAuth2AuthorizedClient:
     scopes: Optional[str] = None
 
     @classmethod
-    def from_dict(cls, data: dict) -> OAuth2AuthorizedClient:
+    def from_dict(cls, data: dict[str, Any]) -> OAuth2AuthorizedClient:
         """Create from a JSON dict with camelCase keys."""
         return cls(
             grant_type=OAuth2GrantType(data.get("grantType", "CLIENT_CREDENTIALS")),
@@ -364,12 +364,12 @@ class TestResult:
     in_progress: bool = False
     runner_type: TestRunnerType = TestRunnerType.HTTP
     test_case_results: list[TestCaseResult] = field(default_factory=list)
-    operation_headers: Optional[dict] = None
+    operation_headers: Optional[dict[str, Any]] = None
     secret_ref: Optional[SecretRef] = None
     authorized_client: Optional[OAuth2AuthorizedClient] = None
 
     @classmethod
-    def from_dict(cls, data: dict) -> TestResult:
+    def from_dict(cls, data: dict[str, Any]) -> TestResult:
         """Create from a JSON dict with camelCase keys."""
         secret_ref = None
         if data.get("secretRef"):
@@ -409,7 +409,7 @@ class DailyInvocationStatistic:
     minute_count: Optional[dict[str, int]] = None
 
     @classmethod
-    def from_dict(cls, data: dict) -> DailyInvocationStatistic:
+    def from_dict(cls, data: dict[str, Any]) -> DailyInvocationStatistic:
         """Create from a JSON dict with camelCase keys."""
         return cls(
             id=data.get("id", ""),

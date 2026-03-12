@@ -16,9 +16,15 @@
 
 from __future__ import annotations
 
+import sys
 import time
 from datetime import date
-from typing import Self
+from typing import Any
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 from urllib.parse import quote
 
 from testcontainers.core.container import DockerContainer
@@ -34,7 +40,7 @@ from .models import (
     UnidirectionalEvent,
 )
 
-class MicrocksContainer(DockerContainer):
+class MicrocksContainer(DockerContainer):  # type: ignore[misc]
     """Testcontainer for Microcks - API mocking and testing.
 
     Provides mock endpoints for REST, SOAP, GraphQL, and gRPC services,
@@ -50,7 +56,7 @@ class MicrocksContainer(DockerContainer):
     MICROCKS_GRPC_PORT = 9090
     DEFAULT_IMAGE = "quay.io/microcks/microcks-uber:1.13.2"
 
-    def __init__(self, image: str = DEFAULT_IMAGE, **kwargs) -> None:
+    def __init__(self, image: str = DEFAULT_IMAGE, **kwargs: Any) -> None:
         super().__init__(image, **kwargs)
         self.with_exposed_ports(self.MICROCKS_HTTP_PORT, self.MICROCKS_GRPC_PORT)
         self._snapshots: list[str] = []
