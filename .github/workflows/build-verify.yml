@@ -1,12 +1,14 @@
 name: build-verify
 on:
   push:
+    branches: [main]
     paths-ignore:
       - '.github/**'
       - '.gitignore'
       - 'LICENSE'
       - '*.md'
   pull_request:
+    branches: [main]
     paths-ignore:
       - '.github/**'
       - '.gitignore'
