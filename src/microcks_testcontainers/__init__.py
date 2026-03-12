@@ -18,9 +18,57 @@ Provides testcontainer support for embedding Microcks into your unit tests
 with lightweight, throwaway container instances.
 """
 
+from .models import (
+    DailyInvocationStatistic,
+    EventMessage,
+    Header,
+    OAuth2AuthorizedClient,
+    OAuth2ClientContext,
+    OAuth2GrantType,
+    Parameter,
+    RemoteArtifact,
+    RemoteArtifactRef,
+    Request,
+    RequestResponsePair,
+    Response,
+    Secret,
+    SecretRef,
+    TestCaseResult,
+    TestRequest,
+    TestResult,
+    TestRunnerType,
+    TestStepResult,
+    UnidirectionalEvent,
+)
+from .assertions import assert_failure, assert_success
 from .exceptions import MicrocksException, MicrocksTestFailure
 
 __all__ = [
+    # Models
+    "DailyInvocationStatistic",
+    "EventMessage",
+    "Header",
+    "OAuth2AuthorizedClient",
+    "OAuth2ClientContext",
+    "OAuth2GrantType",
+    "Parameter",
+    "RemoteArtifact",
+    "RemoteArtifactRef",
+    "Request",
+    "RequestResponsePair",
+    "Response",
+    "Secret",
+    "SecretRef",
+    "TestCaseResult",
+    "TestRequest",
+    "TestResult",
+    "TestRunnerType",
+    "TestStepResult",
+    "UnidirectionalEvent",
+    # Assertions
+    "MicrocksTestFailure",
+    "assert_failure",
+    "assert_success",
     # Exceptions
     "MicrocksException",
     "MicrocksTestFailure",
