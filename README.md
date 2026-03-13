@@ -4,8 +4,10 @@ Python library for [Testcontainers](https://testcontainers.com) that enables emb
 
 ## Installation
 
+> **Note:** This package is not yet published on PyPI. Install directly from GitHub:
+
 ```bash
-pip install microcks-testcontainers
+pip install git+https://github.com/Caesarsage/microcks-testcontainers-python.git
 ```
 
 ## Usage
