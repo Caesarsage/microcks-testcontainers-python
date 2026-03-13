@@ -40,6 +40,15 @@ from .models import (
     TestStepResult,
     UnidirectionalEvent,
 )
+from .connections import (
+    AmazonServiceConnection,
+    GenericConnection,
+    GooglePubSubConnection,
+    KafkaConnection,
+)
+
+from .microcks_containers_ensemble import MicrocksContainersEnsemble
+from .async_minion_container import MicrocksAsyncMinionContainer
 from .microcks_container import MicrocksContainer
 from .assertions import assert_failure, assert_success
 from .exceptions import MicrocksException, MicrocksTestFailure
@@ -47,6 +56,8 @@ from .exceptions import MicrocksException, MicrocksTestFailure
 __all__ = [
     # Containers
     "MicrocksContainer",
+    "MicrocksContainersEnsemble",
+    "MicrocksAsyncMinionContainer",
     # Models
     "DailyInvocationStatistic",
     "EventMessage",
@@ -68,6 +79,11 @@ __all__ = [
     "TestRunnerType",
     "TestStepResult",
     "UnidirectionalEvent",
+    # Connections
+    "AmazonServiceConnection",
+    "GenericConnection",
+    "GooglePubSubConnection",
+    "KafkaConnection",
     # Assertions
     "MicrocksTestFailure",
     "assert_failure",
