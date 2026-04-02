@@ -92,6 +92,25 @@ class MicrocksContainersEnsemble:
 
     # --- Configuration (all return self for chaining) ---
 
+    def with_microcks_env(self, key: str, value: str) -> Self:
+        """Add an environment variable to the main Microcks container."""
+        self._microcks.with_env(key, value)
+        return self
+
+    def with_postman_env(self, key: str, value: str) -> Self:
+        """Add an environment variable to the Postman runtime container."""
+        if self._postman is None:
+            raise RuntimeError("Postman runtime must be enabled first")
+        self._postman.with_env(key, value)
+        return self
+
+    def with_async_minion_env(self, key: str, value: str) -> Self:
+        """Add an environment variable to the Async Minion container."""
+        if self._async_minion is None:
+            raise RuntimeError("Async feature must be enabled first")
+        self._async_minion_env[key] = value
+        return self
+
     def with_debug_log_level(self) -> Self:
         """Enable debug log level on all containers in the ensemble."""
         self._microcks.with_debug_log_level()
@@ -138,14 +157,7 @@ class MicrocksContainersEnsemble:
         return self
 
     def with_snapshots(self, snapshots: list[str]) -> Self:
-        """_summary_
-
-        Args:
-            snapshots (list[str]): _description_
-
-        Returns:
-            Self: _description_
-        """        """Provide paths to repository snapshots that will be imported."""
+        """Provide paths to repository snapshots that will be imported."""
         self._microcks.with_snapshots(snapshots)
         return self
 
@@ -224,6 +236,11 @@ class MicrocksContainersEnsemble:
             self._async_minion.stop()
 
     # --- Accessors ---
+
+    @property
+    def network(self) -> Network:
+        """Get the Docker network used by the ensemble."""
+        return self._network
 
     def get_microcks_container(self) -> MicrocksContainer:
         """Get the main Microcks container."""
